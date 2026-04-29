@@ -7,11 +7,15 @@ export function CategoriesPage() {
 
   const handleAddCategory = () => {
     if (!name.trim()) {
-      toast.error("Silahkan isi dahulu");
+      toast.error("Tidak Dapat Menyimpan", {
+        description: "Silakan isi nama kategori terlebih dahulu."
+      });
       return;
     }
     
-    toast.success("Kategori berhasil ditambahkan");
+    toast.success("Kategori Berhasil Ditambahkan", {
+      description: `Kategori "${name}" telah disimpan ke database.`
+    });
     setName("");
     setDescription("");
   };

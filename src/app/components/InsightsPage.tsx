@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, TrendingUp, Newspaper, Search, XCircle, X, ChevronDown } from "lucide-react";
+import { Sparkles, TrendingUp, Newspaper, Search, XCircle, X, ChevronDown, Activity, Globe } from "lucide-react";
 
 interface InsightsPageProps {
   activeTab: string;
@@ -7,14 +7,19 @@ interface InsightsPageProps {
 }
 
 export function InsightsPage({ activeTab, setActivePage }: InsightsPageProps) {
-  // Normalize tab names to match the UI screenshot
-  const currentTab = activeTab === "Social Insight" ? "Social Trends" 
-                   : activeTab === "News Insight" ? "News Search" 
-                   : activeTab === "Insights" ? "Saved Insights" 
-                   : activeTab;
+  // Map internal sidebar names to display tab names if needed,
+  // but we can just use the actual display tab names directly now
+  const currentTab = 
+    activeTab === "News Insight" ? "News Search" :
+    activeTab === "Social Insight" ? "Social Trends" :
+    activeTab === "Saved Insights" ? "Saved Insights" :
+    activeTab === "Kompetitor Monitor" ? "Kompetitor Monitor" :
+    activeTab;
 
   const [newsQuery, setNewsQuery] = useState("");
   const [socialQuery, setSocialQuery] = useState("");
+  const [competitorUrl, setCompetitorUrl] = useState("");
+  const [competitorKeyword, setCompetitorKeyword] = useState("");
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -29,7 +34,6 @@ export function InsightsPage({ activeTab, setActivePage }: InsightsPageProps) {
       triggerError("Topik berita harus diisi");
       return;
     }
-    // search logic
   };
 
   const handleSocialSearch = () => {
@@ -37,11 +41,24 @@ export function InsightsPage({ activeTab, setActivePage }: InsightsPageProps) {
       triggerError("Kata kunci viral harus diisi");
       return;
     }
-    // search logic
   };
 
+  const handleCompetitorSearch = () => {
+    if (!competitorUrl.trim()) {
+      triggerError("Sumber berita harus diisi");
+      return;
+    }
+  };
+
+  const tabs = [
+    { id: "Saved Insights", label: "Saved Insights" },
+    { id: "News Search", label: "News Search" },
+    { id: "Social Trends", label: "Social Trends" },
+    { id: "Kompetitor Monitor", label: "Kompetitor Monitor" }
+  ];
+
   return (
-    <div className="max-w-[1400px] mx-auto space-y-8 animate-in fade-in duration-300 relative">
+    <div className="max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-300 relative">
       {/* Error Toast */}
       {showError && (
         <div className="fixed top-8 right-8 z-50 animate-in slide-in-from-top-6 fade-in duration-300">
@@ -60,96 +77,73 @@ export function InsightsPage({ activeTab, setActivePage }: InsightsPageProps) {
         </div>
       )}
 
-      {/* Header */}
-      <div>
-        <h2 className="text-3xl font-bold text-slate-800 tracking-tight mb-1">
-          AI Insights
-        </h2>
-        <p className="text-slate-500 text-base font-medium">
-          {currentTab === "Social Trends" 
-            ? "Riset artikel trending dan scrape konten kompetitor otomatis."
-            : "Riset artikel trending dari space konten kompetitor otomatis."}
-        </p>
+      {/* Top Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 pb-2">
+        {/* Title and Subtitle */}
+        <div>
+          <h2 className="text-[22px] font-bold text-[#1e293b] tracking-tight mb-1">
+            AI Insights
+          </h2>
+          <p className="text-[14px] text-[#64748b] font-medium">
+            Riset artikel trending dan scrape konten kompetitor otomatis.
+          </p>
+        </div>
+
+        {/* Tab Buttons Pill */}
+        <div className="flex items-center p-1 bg-white border border-[#e2e8f0] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.02)] overflow-x-auto shrink-0 hide-scrollbar">
+          {tabs.map((tab) => {
+            const isActive = currentTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  // Map back to sidebar keys when clicked
+                  const pageId = 
+                    tab.id === "News Search" ? "News Insight" :
+                    tab.id === "Social Trends" ? "Social Insight" :
+                    tab.id;
+                  setActivePage(pageId);
+                }}
+                className={`px-5 py-2.5 text-[13px] font-semibold rounded-lg transition-all whitespace-nowrap ${
+                  isActive
+                    ? "text-[#0f172a] bg-[#f8fafc]"
+                    : "text-[#64748b] hover:text-[#0f172a] hover:bg-[#f8fafc]/50"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-8 border-b border-slate-200/80 mb-6">
-        {["Saved Insights", "News Search", "Social Trends"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActivePage(tab)}
-            className={`pb-4 text-sm font-bold transition-all relative ${
-              currentTab === tab
-                ? "text-blue-600"
-                : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            {tab}
-            {currentTab === tab && (
-              <div className="absolute bottom-0 left-0 w-full h-[2px] bg-blue-600 rounded-t-full" />
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Main Card */}
-      <div className="bg-white rounded-[24px] p-8 shadow-sm border border-slate-200/60 min-h-[500px]">
+      {/* Main Content Area */}
+      <div className="bg-white rounded-2xl border border-[#e2e8f0] p-8 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] min-h-[400px]">
         
         {currentTab === "Saved Insights" && (
-          <div className="space-y-12">
-            <div className="p-6 rounded-2xl border border-slate-200 bg-white">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-500 shrink-0">
-                  <Sparkles size={24} strokeWidth={2} />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-800 mb-1">Antrian Artikel AI</h3>
-                  <p className="text-sm text-slate-500 font-medium mb-3">
-                    Insight yang sudah disimpan akan terlihat dalam antrian pembuatan Content Strategy.
-                  </p>
-                  <div className="flex items-center gap-4 text-xs font-bold">
-                    <span className="text-slate-500 flex items-center gap-1.5">
-                      <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-400 opacity-50" />
-                      16 April 2026
-                    </span>
-                    <span className="px-3 py-1.5 bg-orange-50 text-orange-600 rounded-full border border-orange-100">
-                      Dalam Antrian
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center justify-center text-center opacity-70 py-20 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
-              <div className="w-16 h-16 rounded-[20px] bg-white border border-slate-100 flex items-center justify-center mb-6 shadow-sm">
-                <TrendingUp size={28} className="text-slate-400" strokeWidth={2.5} />
-              </div>
-              <p className="text-sm text-slate-500 font-medium max-w-[380px] leading-relaxed">
-                Belum ada insight yang disimpan. Lakukan riset melalui <span className="text-blue-600 font-bold">News Search</span> atau <span className="text-blue-600 font-bold">Social Trends</span>.
+          <div className="space-y-6">
+            <h3 className="text-[16px] font-bold text-[#1e293b]">Antrian Artikel AI</h3>
+            <p className="text-[14px] text-[#64748b] font-medium">
+              Insight yang sudah disimpan atau sedang dalam antrian pemrosesan Content Strategy.
+            </p>
+            
+            <div className="mt-16 flex items-center justify-center text-center">
+              <p className="text-[14px] text-[#64748b] font-medium max-w-md">
+                Belum ada insight yang disimpan. Lakukan riset melalui tab News Search atau Social Trends.
               </p>
             </div>
           </div>
         )}
 
         {currentTab === "News Search" && (
-          <div className="space-y-10">
-            <div>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-500 shrink-0">
-                  <Newspaper size={24} strokeWidth={2} />
-                </div>
-                <h3 className="text-lg font-bold text-slate-800">News Search Engine</h3>
-              </div>
-              <p className="text-sm text-slate-500 font-medium">
-                Mencari artikel berita relevan dari seluruh web via Google News API.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
-              <div className="space-y-2 md:col-span-5">
-                <label className="text-[13px] font-bold text-slate-800">
-                  Topik Berita
-                </label>
+          <div className="space-y-6">
+            <h3 className="text-[16px] font-bold text-[#1e293b]">News Search Engine</h3>
+            <p className="text-[14px] text-[#64748b] font-medium">
+              Mencari artikel berita relevan dari seluruh web via Google News API.
+            </p>
+            
+            <div className="flex flex-col md:flex-row items-center gap-4 mt-6">
+              <div className="w-full md:flex-1">
                 <input
                   type="text"
                   value={newsQuery}
@@ -157,70 +151,42 @@ export function InsightsPage({ activeTab, setActivePage }: InsightsPageProps) {
                     setNewsQuery(e.target.value);
                     if (showError) setShowError(false);
                   }}
-                  placeholder="Contoh: Harga Emas"
-                  className={`w-full px-4 py-3 bg-white border rounded-xl text-sm focus:outline-none transition-all font-medium text-slate-800 placeholder:text-slate-400 ${
-                    showError && !newsQuery.trim()
-                      ? "border-red-300 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-red-50/30" 
-                      : "border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                  }`}
+                  placeholder="Topik berita (contoh: Harga Emas)"
+                  className="w-full px-4 py-2.5 bg-white border border-[#e2e8f0] rounded-lg text-[14px] font-medium text-[#1e293b] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all"
                 />
               </div>
 
-              <div className="space-y-2 md:col-span-4">
-                <label className="text-[13px] font-bold text-slate-800">
-                  Rentang Waktu
-                </label>
-                <div className="relative">
-                  <select className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800 appearance-none cursor-pointer pr-10">
-                    <option value="today">Hari ini</option>
-                    <option value="week">Minggu ini</option>
-                    <option value="month">Bulan ini</option>
-                  </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                    <ChevronDown size={16} strokeWidth={2.5} />
-                  </div>
+              <div className="w-full md:w-[220px] shrink-0 relative">
+                <select className="w-full px-4 py-2.5 bg-white border border-[#e2e8f0] rounded-lg text-[14px] font-medium text-[#1e293b] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all appearance-none cursor-pointer pr-10">
+                  <option value="24h">24 Jam Terakhir</option>
+                  <option value="1w">1 Minggu Terakhir</option>
+                  <option value="1m">1 Bulan Terakhir</option>
+                  <option value="any">Kapanpun</option>
+                </select>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#64748b]">
+                  <ChevronDown size={16} strokeWidth={2.5} />
                 </div>
               </div>
 
-              <div className="md:col-span-3">
-                <button 
-                  onClick={handleNewsSearch}
-                  className="w-full flex items-center justify-center gap-2 bg-[#1976d2] hover:bg-[#176bbf] text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-0.5"
-                >
-                  <Search size={18} strokeWidth={2.5} />
-                  Search
-                </button>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center justify-center text-center py-20 rounded-2xl bg-slate-50/50 mt-10 border border-dashed border-slate-200">
-              <div className="w-16 h-16 rounded-[20px] bg-white border border-slate-100 shadow-sm flex items-center justify-center mb-6">
-                <Search size={28} className="text-slate-400" strokeWidth={2.5} />
-              </div>
-              <h4 className="text-base font-bold text-slate-800 mb-2">Mulai Pencarian</h4>
-              <p className="text-sm text-slate-500 font-medium max-w-[340px] leading-relaxed">
-                Masukkan topik berita dan klik tombol <span className="text-blue-600 font-bold">Search</span> untuk mencari artikel terbaru.
-              </p>
+              <button 
+                onClick={handleNewsSearch}
+                className="w-full md:w-auto px-8 py-2.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-[14px] font-bold rounded-lg transition-colors shrink-0"
+              >
+                Search
+              </button>
             </div>
           </div>
         )}
 
         {currentTab === "Social Trends" && (
-          <div className="space-y-10">
-            <div>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-500 shrink-0">
-                  <TrendingUp size={24} strokeWidth={2} />
-                </div>
-                <h3 className="text-lg font-bold text-slate-800">Social Media Trends</h3>
-              </div>
-              <p className="text-sm text-slate-500 font-medium">
-                Mencari konten viral dan trending dari TikTok & Social Media lainnya via RapidAPI.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-              <div className="md:col-span-6">
+          <div className="space-y-6">
+            <h3 className="text-[16px] font-bold text-[#1e293b]">Social Media Trends</h3>
+            <p className="text-[14px] text-[#64748b] font-medium">
+              Mencari konten viral dan trending dari TikTok & Sosial Media lainnya via RapidAPI.
+            </p>
+            
+            <div className="flex flex-col md:flex-row items-center gap-4 mt-6">
+              <div className="w-full md:flex-1">
                 <input
                   type="text"
                   value={socialQuery}
@@ -229,44 +195,77 @@ export function InsightsPage({ activeTab, setActivePage }: InsightsPageProps) {
                     if (showError) setShowError(false);
                   }}
                   placeholder="Kata kunci viral (contoh: Lebaran 2024)"
-                  className={`w-full px-4 py-3 bg-white border rounded-xl text-sm focus:outline-none transition-all font-medium text-slate-800 placeholder:text-slate-400 ${
-                    showError && !socialQuery.trim()
-                      ? "border-red-300 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-red-50/30" 
-                      : "border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                  }`}
+                  className="w-full px-4 py-2.5 bg-white border border-[#e2e8f0] rounded-lg text-[14px] font-medium text-[#1e293b] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all"
                 />
               </div>
 
-              <div className="md:col-span-3 relative">
-                <select className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800 appearance-none cursor-pointer pr-10">
-                  <option value="tiktok">Tik Tok</option>
-                  <option value="instagram">Instagram</option>
-                  <option value="twitter">X / Twitter</option>
+              <div className="w-full md:w-[220px] shrink-0 relative">
+                <select className="w-full px-4 py-2.5 bg-white border border-[#e2e8f0] rounded-lg text-[14px] font-medium text-[#1e293b] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all appearance-none cursor-pointer pr-10">
+                  <option value="tiktok">TikTok</option>
+                  <option value="twitter">X (Twitter) - Coming Soon</option>
                 </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#64748b]">
                   <ChevronDown size={16} strokeWidth={2.5} />
                 </div>
               </div>
 
-              <div className="md:col-span-3">
-                <button 
-                  onClick={handleSocialSearch}
-                  className="w-full flex items-center justify-center gap-2 bg-[#1976d2] hover:bg-[#176bbf] text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-0.5"
-                >
-                  <Search size={18} strokeWidth={2.5} />
-                  Search Trend
-                </button>
-              </div>
+              <button 
+                onClick={handleSocialSearch}
+                className="w-full md:w-auto px-6 py-2.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-[14px] font-bold rounded-lg transition-colors shrink-0"
+              >
+                Search Trend
+              </button>
             </div>
+          </div>
+        )}
 
-            <div className="flex flex-col items-center justify-center text-center py-20 rounded-2xl bg-slate-50/50 mt-10 border border-dashed border-slate-200">
-              <div className="w-16 h-16 rounded-[20px] bg-white border border-slate-100 shadow-sm flex items-center justify-center mb-6">
-                <TrendingUp size={28} className="text-slate-400" strokeWidth={2.5} />
+        {currentTab === "Kompetitor Monitor" && (
+          <div className="space-y-4">
+            <div>
+              <input
+                type="text"
+                value={competitorUrl}
+                onChange={(e) => {
+                  setCompetitorUrl(e.target.value);
+                  if (showError) setShowError(false);
+                }}
+                placeholder="Sumber berita (contoh: antaranews.com)"
+                className="w-full px-4 py-2.5 bg-white border border-[#e2e8f0] rounded-lg text-[14px] font-medium text-[#1e293b] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all"
+              />
+            </div>
+            
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <div className="w-full md:flex-1">
+                <input
+                  type="text"
+                  value={competitorKeyword}
+                  onChange={(e) => {
+                    setCompetitorKeyword(e.target.value);
+                  }}
+                  placeholder="Kata kunci (opsional)"
+                  className="w-full px-4 py-2.5 bg-white border border-[#e2e8f0] rounded-lg text-[14px] font-medium text-[#1e293b] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all"
+                />
               </div>
-              <h4 className="text-base font-bold text-slate-800 mb-2">Mulai Pelacakan</h4>
-              <p className="text-sm text-slate-500 font-medium max-w-[340px] leading-relaxed">
-                Masukkan kata kunci viral dan klik tombol <span className="text-blue-600 font-bold">Search Trend</span> untuk melacak konten trending.
-              </p>
+
+              <div className="w-full md:w-[220px] shrink-0 relative">
+                <select className="w-full px-4 py-2.5 bg-white border border-[#e2e8f0] rounded-lg text-[14px] font-medium text-[#1e293b] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all appearance-none cursor-pointer pr-10">
+                  <option value="1w">1 Minggu Terakhir</option>
+                  <option value="1h">1 Jam Terakhir</option>
+                  <option value="24h">24 Jam Terakhir</option>
+                  <option value="1m">1 Bulan Terakhir</option>
+                  <option value="any">Kapanpun</option>
+                </select>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#64748b]">
+                  <ChevronDown size={16} strokeWidth={2.5} />
+                </div>
+              </div>
+
+              <button 
+                onClick={handleCompetitorSearch}
+                className="w-full md:w-[100px] px-6 py-2.5 bg-[#60a5fa] hover:bg-[#3b82f6] text-white text-[14px] font-bold rounded-lg transition-colors shrink-0 flex items-center justify-center"
+              >
+                Cari
+              </button>
             </div>
           </div>
         )}

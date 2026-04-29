@@ -13,9 +13,13 @@ import {
   ChevronDown
 } from "lucide-react";
 
+import { ConfirmModal } from "./ConfirmModal";
+
 export function SettingsPage() {
   const [activeTab, setActiveTab] = useState("identitas");
   const [isSaved, setIsSaved] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [rekToDelete, setRekToDelete] = useState<number | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const faviconInputRef = useRef<HTMLInputElement>(null);
   const qrisInputRef = useRef<HTMLInputElement>(null);
@@ -110,20 +114,17 @@ export function SettingsPage() {
   };
 
   const handleDeleteRekening = (id: number) => {
-    toast("Apakah Anda yakin ingin menghapus rekening?", {
-      duration: 8000,
-      action: {
-        label: "IYA",
-        onClick: () => {
-          setRekeningList(prev => prev.filter(r => r.id !== id));
-          toast.success("Rekening berhasil dihapus");
-        }
-      },
-      cancel: {
-        label: "TIDAK",
-        onClick: () => {}
-      },
-    });
+    setRekToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteRekening = () => {
+    if (rekToDelete !== null) {
+      setRekeningList(prev => prev.filter(r => r.id !== rekToDelete));
+      toast.success("Rekening Berhasil Dihapus", { description: "Data rekening telah dihapus dari sistem." });
+      setShowDeleteModal(false);
+      setRekToDelete(null);
+    }
   };
 
   return (
@@ -686,6 +687,17 @@ export function SettingsPage() {
         </div>
 
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        title="Hapus Rekening?"
+        message="Apakah Anda yakin ingin menghapus rekening ini? Data yang dihapus tidak dapat dikembalikan."
+        confirmText="OK"
+        cancelText="Cancel"
+        onConfirm={confirmDeleteRekening}
+        onCancel={() => setShowDeleteModal(false)}
+        isDestructive={true}
+      />
     </div>
   );
 }

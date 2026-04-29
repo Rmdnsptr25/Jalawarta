@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { 
   CloudDownload, 
   Upload, 
@@ -121,6 +121,8 @@ function ToolsHub({ onViewChange }: ViewProps) {
 
 function ToolsImport({ onViewChange }: ViewProps) {
   const [fileSelected, setFileSelected] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImport = () => {
     if (!fileSelected) {
@@ -130,8 +132,28 @@ function ToolsImport({ onViewChange }: ViewProps) {
       return;
     }
     toast.success("Impor Dimulai", {
-      description: "Sistem sedang memproses file XML Anda. Harap tunggu beberapa saat."
+      description: `Sistem sedang memproses file ${fileName}. Harap tunggu beberapa saat.`
     });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFileSelected(true);
+      setFileName(e.target.files[0].name);
+    }
+  };
+
+  const handleSelectFile = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleRemoveFile = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFileSelected(false);
+    setFileName("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -168,19 +190,35 @@ function ToolsImport({ onViewChange }: ViewProps) {
             </p>
             
             {!fileSelected ? (
-              <button 
-                onClick={() => setFileSelected(true)}
-                className="px-8 py-3 bg-white border border-slate-200 rounded-[20px] text-slate-700 font-bold hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm text-sm"
-              >
-                Pilih File
-              </button>
+              <>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleFileChange} 
+                  accept=".xml" 
+                  className="hidden" 
+                />
+                <button 
+                  onClick={handleSelectFile}
+                  className="px-8 py-3 bg-white border border-slate-200 rounded-[20px] text-slate-700 font-bold hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm text-sm"
+                >
+                  Pilih File
+                </button>
+              </>
             ) : (
               <div className="flex flex-col items-center gap-4 w-full">
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleFileChange} 
+                  accept=".xml" 
+                  className="hidden" 
+                />
                 <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-xl border border-emerald-200 shadow-sm text-emerald-700 w-full max-w-sm">
                   <FileText size={20} className="text-emerald-500 shrink-0" />
-                  <span className="text-sm font-semibold truncate flex-1 text-left">wordpress-export-2026.xml</span>
+                  <span className="text-sm font-semibold truncate flex-1 text-left">{fileName}</span>
                   <button 
-                    onClick={(e) => { e.stopPropagation(); setFileSelected(false); }}
+                    onClick={handleRemoveFile}
                     className="text-slate-400 hover:text-red-500 text-xs font-bold px-2 py-1"
                   >
                     HAPUS

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Tag, Plus, XCircle, X } from "lucide-react";
+import { toast } from "sonner";
 
 export function TagsPage() {
   const [tagName, setTagName] = useState("");
@@ -47,10 +48,16 @@ export function TagsPage() {
   const handleAddTag = () => {
     if (!tagName.trim()) {
       setShowError(true);
+      toast.error("Tidak Dapat Menyimpan", {
+        description: "Silakan isi nama tag terlebih dahulu sebelum menyimpan."
+      });
       setTimeout(() => setShowError(false), 4000);
       return;
     }
     // Simulate successful add
+    toast.success("Tag Berhasil Ditambahkan", {
+      description: `Tag "${tagName}" telah disimpan ke database.`
+    });
     setShowError(false);
     setTagName("");
   };

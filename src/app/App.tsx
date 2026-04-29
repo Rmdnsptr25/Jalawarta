@@ -45,6 +45,7 @@ import { AddOnsPage } from "./components/AddOnsPage";
 import { SettingsPage } from "./components/SettingsPage";
 import { ProfilePage } from "./components/ProfilePage";
 import { LoginPage } from "./components/LoginPage";
+import { LandingPage } from "./components/LandingPage";
 import { supabase } from "./lib/supabase";
 import { Toaster } from "sonner";
 import {
@@ -55,6 +56,7 @@ import {
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activePage, setActivePage] = useState("All Posts");
   const [expandedMenus, setExpandedMenus] = useState<string[]>([
@@ -115,8 +117,9 @@ export default function App() {
       label: "Insights",
       subItems: [
         { id: "Saved Insights", label: "Saved Insights" },
-        { id: "News Search", label: "News Search" },
-        { id: "Social Trends", label: "Social Trends" },
+        { id: "News Insight", label: "News Insight" },
+        { id: "Social Insight", label: "Social Insight" },
+        { id: "Kompetitor Monitor", label: "Kompetitor Monitor" },
       ],
     },
     {
@@ -208,9 +211,26 @@ export default function App() {
   }
 
   if (!isAuthenticated) {
+    if (!showLogin) {
+      return (
+        <div className="flex h-screen w-full flex-col font-['Inter',sans-serif] overflow-hidden">
+          <Toaster position="top-center" richColors />
+          <div className="flex-1 overflow-y-auto">
+            <LandingPage onLoginClick={() => setShowLogin(true)} />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="flex h-screen w-full flex-col font-['Inter',sans-serif] overflow-hidden">
         <Toaster position="top-center" richColors />
+        <button 
+          onClick={() => setShowLogin(false)}
+          className="absolute top-6 left-6 z-50 px-4 py-2 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-full text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors shadow-sm"
+        >
+          ← Kembali
+        </button>
         <LoginPage onLogin={() => setIsAuthenticated(true)} />
       </div>
     );
@@ -754,10 +774,9 @@ export default function App() {
           ) : [
               "Insights",
               "Saved Insights",
-              "News Search",
-              "Social Trends",
               "News Insight",
               "Social Insight",
+              "Kompetitor Monitor",
             ].includes(activePage) ? (
             <InsightsPage
               activeTab={

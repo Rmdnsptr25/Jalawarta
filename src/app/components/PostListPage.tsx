@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { projectId, publicAnonKey } from "/utils/supabase/info";
 import { supabase } from "../lib/supabase";
 
+import { ConfirmModal } from "./ConfirmModal";
+
 interface PostListPageProps {
   setActivePage: (page: string) => void;
   colors?: any;
@@ -22,6 +24,9 @@ export function PostListPage({ setActivePage, colors }: PostListPageProps) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<Post | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchPosts = async () => {
     try {
@@ -48,13 +53,20 @@ export function PostListPage({ setActivePage, colors }: PostListPageProps) {
     fetchPosts();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus berita ini?")) return;
+  const confirmDelete = (post: Post) => {
+    setPostToDelete(post);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!postToDelete) return;
+    
+    setIsDeleting(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Silakan login kembali.");
 
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-038ff37a/posts/${id}`, {
+      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-038ff37a/posts/${postToDelete.id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${session.access_token}`
@@ -62,10 +74,14 @@ export function PostListPage({ setActivePage, colors }: PostListPageProps) {
       });
       if (!res.ok) throw new Error("Gagal menghapus berita");
       
-      toast.success("Berita Dihapus");
-      setPosts(posts.filter(p => p.id !== id));
+      toast.success("Berita Berhasil Dihapus", { description: "Berita telah dihapus permanen" });
+      setPosts(posts.filter(p => p.id !== postToDelete.id));
     } catch (err: any) {
       toast.error("Gagal", { description: err.message });
+    } finally {
+      setIsDeleting(false);
+      setDeleteModalOpen(false);
+      setPostToDelete(null);
     }
   };
 
@@ -197,7 +213,7 @@ export function PostListPage({ setActivePage, colors }: PostListPageProps) {
                           <Edit3 size={16} />
                         </button>
                         <button 
-                          onClick={() => handleDelete(post.id)}
+                          onClick={() => confirmDelete(post)}
                           className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         >
                           <Trash2 size={16} />
@@ -211,6 +227,18 @@ export function PostListPage({ setActivePage, colors }: PostListPageProps) {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        title="Hapus Berita?"
+        message={`Apakah Anda yakin ingin menghapus "${postToDelete?.title || "berita ini"}"? Berita yang dihapus tidak dapat dikembalikan.`}
+        confirmText="OK"
+        cancelText="Cancel"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteModalOpen(false)}
+        isLoading={isDeleting}
+        isDestructive={true}
+      />
     </div>
   );
 }
