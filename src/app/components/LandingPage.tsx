@@ -1,427 +1,489 @@
-import { ArrowRight, Cloud, Zap, Shield, BarChart3, Globe, Smartphone, CheckCircle2, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { 
+  ArrowRight, Cloud, Zap, Shield, Globe, 
+  Menu, X, CheckCircle2, ChevronRight, 
+  Play, Sparkles, Activity, Layers, Lock,
+  Sun, Moon
+} from "lucide-react";
+import { motion } from "motion/react";
 
 interface LandingPageProps {
   onLoginClick: () => void;
 }
 
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
 export function LandingPage({ onLoginClick }: LandingPageProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  // Default to light mode (false), you can toggle
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-['Inter',sans-serif] text-slate-900 overflow-x-hidden">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-slate-200/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            {/* Logo */}
-            <div className="flex-shrink-0 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center font-bold text-white shadow-lg">
-                JW
+    <div className={`${isDark ? 'dark' : ''}`}>
+      <div className="min-h-screen font-['Inter',sans-serif] bg-[#f2fbff] dark:bg-[#030303] text-slate-600 dark:text-slate-200 overflow-x-hidden selection:bg-[#2f80ed]/30 transition-colors duration-300">
+        
+        {/* Navigation */}
+        <nav className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${
+          scrolled ? "bg-white/80 dark:bg-[#030303]/80 backdrop-blur-xl border-slate-200 dark:border-white/10 py-4" : "bg-transparent border-transparent py-6"
+        }`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center">
+              {/* Logo */}
+              <div className="flex-shrink-0 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#81d4fa] to-[#2f80ed] flex items-center justify-center font-bold text-white shadow-[0_0_20px_rgba(47,128,237,0.4)]">
+                  JW
+                </div>
+                <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">JalaWarta</span>
               </div>
-              <span className="font-bold text-xl tracking-tight text-slate-800">Jala Warta</span>
-            </div>
 
-            {/* Desktop Menu */}
-            <div className="hidden md:flex space-x-8 items-center">
-              <a href="#features" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">Fitur</a>
-              <a href="#solutions" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">Solusi</a>
-              <a href="#pricing" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">Harga</a>
-              <button 
-                onClick={onLoginClick}
-                className="text-slate-600 hover:text-blue-600 font-bold transition-colors"
-              >
-                Masuk
-              </button>
-              <button 
-                onClick={onLoginClick}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full font-bold transition-colors shadow-md shadow-blue-500/20"
-              >
-                Coba Gratis
-              </button>
-            </div>
+              {/* Desktop Menu */}
+              <div className="hidden md:flex space-x-8 items-center bg-white/50 dark:bg-white/5 px-6 py-2 rounded-full border border-slate-200 dark:border-white/10 backdrop-blur-md">
+                <a href="#features" className="text-sm text-slate-600 hover:text-[#2f80ed] dark:text-slate-300 dark:hover:text-white font-medium transition-colors">Fitur</a>
+                <a href="#bento" className="text-sm text-slate-600 hover:text-[#2f80ed] dark:text-slate-300 dark:hover:text-white font-medium transition-colors">Solusi</a>
+                <a href="#pricing" className="text-sm text-slate-600 hover:text-[#2f80ed] dark:text-slate-300 dark:hover:text-white font-medium transition-colors">Harga</a>
+              </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
-              <button 
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-slate-600 hover:text-slate-900"
-              >
-                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
+              <div className="hidden md:flex items-center gap-4">
+                <button 
+                  onClick={() => setIsDark(!isDark)}
+                  className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
+                  title="Toggle Theme"
+                >
+                  {isDark ? <Sun size={20} /> : <Moon size={20} />}
+                </button>
+                <button 
+                  onClick={onLoginClick}
+                  className="text-sm text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white font-semibold transition-colors"
+                >
+                  Masuk
+                </button>
+                <button 
+                  onClick={onLoginClick}
+                  className="text-sm bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-200 dark:text-slate-900 px-5 py-2.5 rounded-full font-bold transition-all shadow-[0_0_20px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center gap-2"
+                >
+                  Coba Gratis <ChevronRight size={16} />
+                </button>
+              </div>
+
+              {/* Mobile menu button */}
+              <div className="md:hidden flex items-center gap-4">
+                <button 
+                  onClick={() => setIsDark(!isDark)}
+                  className="text-slate-500 dark:text-slate-400"
+                >
+                  {isDark ? <Sun size={24} /> : <Moon size={24} />}
+                </button>
+                <button 
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="text-slate-700 dark:text-slate-300"
+                >
+                  {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-slate-100 px-4 pt-2 pb-4 space-y-1 shadow-lg absolute w-full">
-            <a href="#features" className="block px-3 py-3 text-base font-medium text-slate-700 hover:bg-slate-50 rounded-lg">Fitur</a>
-            <a href="#solutions" className="block px-3 py-3 text-base font-medium text-slate-700 hover:bg-slate-50 rounded-lg">Solusi</a>
-            <a href="#pricing" className="block px-3 py-3 text-base font-medium text-slate-700 hover:bg-slate-50 rounded-lg">Harga</a>
-            <button 
-              onClick={onLoginClick}
-              className="block w-full text-left px-3 py-3 text-base font-bold text-slate-700 hover:bg-slate-50 rounded-lg"
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="md:hidden absolute top-full left-0 w-full bg-white dark:bg-[#0a0a0a] border-b border-slate-200 dark:border-white/10 px-4 py-6 space-y-4 shadow-2xl"
             >
-              Masuk
-            </button>
-            <div className="px-3 pt-2">
+              <a href="#features" className="block text-base font-medium text-slate-600 dark:text-slate-300">Fitur</a>
+              <a href="#bento" className="block text-base font-medium text-slate-600 dark:text-slate-300">Solusi</a>
+              <a href="#pricing" className="block text-base font-medium text-slate-600 dark:text-slate-300">Harga</a>
+              <div className="pt-4 border-t border-slate-200 dark:border-white/10 flex flex-col gap-3">
+                <button onClick={onLoginClick} className="w-full text-center py-3 text-slate-700 dark:text-slate-300 font-bold border border-slate-200 dark:border-white/10 rounded-xl">
+                  Masuk
+                </button>
+                <button onClick={onLoginClick} className="w-full bg-[#2f80ed] text-white py-3 rounded-xl font-bold">
+                  Coba Gratis Sekarang
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </nav>
+
+        {/* Hero Section */}
+        <section className="relative pt-40 pb-20 lg:pt-52 lg:pb-32 px-4 sm:px-6 lg:px-8 overflow-hidden min-h-[90vh] flex flex-col items-center">
+          {/* Abstract Glowing Orbs Background */}
+          <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-[#2f80ed]/10 dark:bg-[#2f80ed]/20 rounded-full blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#81d4fa]/20 dark:bg-[#81d4fa]/20 rounded-full blur-[100px] pointer-events-none translate-x-1/2" />
+          <div className="absolute top-1/2 left-1/2 w-[800px] h-[400px] bg-[#2360b2]/10 dark:bg-[#2360b2]/20 rounded-full blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
+
+          {/* Grid pattern overlay */}
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] dark:opacity-20 pointer-events-none mix-blend-overlay"></div>
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none"></div>
+
+          <div className="max-w-5xl mx-auto text-center relative z-10 flex flex-col items-center">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 font-medium text-sm mb-8 backdrop-blur-md shadow-sm"
+            >
+              <Sparkles size={16} className="text-[#2f80ed] dark:text-[#81d4fa]" />
+              <span>SaaS Media Generasi Berikutnya v2.0</span>
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter text-slate-900 dark:text-white mb-8 leading-[1.1]"
+            >
+              Bangun Media, <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2f80ed] via-[#2360b2] to-[#102d53] dark:from-[#81d4fa] dark:via-[#2f80ed] dark:to-[#102d53]">
+                Bukan Infrastruktur.
+              </span>
+            </motion.h1>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-xl text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed font-light"
+            >
+              Tinggalkan CMS tradisional. JalaWarta adalah platform SaaS <strong className="text-slate-900 dark:text-white font-medium">all-in-one</strong> dengan auto-scaling, analitik pintar, dan performa super cepat.
+            </motion.p>
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto"
+            >
               <button 
                 onClick={onLoginClick}
-                className="w-full bg-blue-600 text-white px-4 py-3 rounded-xl font-bold"
+                className="w-full sm:w-auto px-8 py-4 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-900 rounded-full font-bold text-lg transition-all shadow-[0_0_30px_rgba(0,0,0,0.1)] dark:shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:scale-105 flex items-center justify-center gap-2"
               >
-                Coba Gratis Sekarang
+                Mulai Gratis <ArrowRight size={20} />
               </button>
-            </div>
+              <button className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-900 dark:text-white rounded-full font-bold text-lg transition-all backdrop-blur-md flex items-center justify-center gap-2 shadow-sm">
+                <Play size={20} className="fill-slate-900 dark:fill-white" /> Lihat Demo
+              </button>
+            </motion.div>
           </div>
-        )}
-      </nav>
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 lg:pt-48 lg:pb-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        {/* Background Gradients */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl"></div>
-          <div className="absolute top-40 right-10 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 font-semibold text-sm mb-8 border border-blue-100">
-            <span className="flex h-2 w-2 rounded-full bg-blue-600"></span>
-            Bukan Sekadar CMS. Ini adalah SaaS Media.
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-8 leading-[1.1]">
-            Bangun Imperium Media <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Tanpa Ribet Server</span>
-          </h1>
-          
-          <p className="text-xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-            Jala Warta adalah platform SaaS *end-to-end* untuk portal berita modern. Skalabilitas otomatis, monetisasi terintegrasi, dan analitik cerdas—semua siap pakai di cloud.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button 
-              onClick={onLoginClick}
-              className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold text-lg transition-all shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2"
-            >
-              Mulai 14 Hari Trial <ArrowRight size={20} />
-            </button>
-            <button className="w-full sm:w-auto px-8 py-4 bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 rounded-full font-bold text-lg transition-all">
-              Jadwalkan Demo
-            </button>
-          </div>
-          
-          <div className="mt-12 text-sm text-slate-500 font-medium">
-            Telah dipercaya oleh 500+ media lokal & nasional.
-          </div>
-        </div>
-
-        {/* Dashboard Preview */}
-        <div className="max-w-6xl mx-auto mt-20 relative z-10">
-          <div className="rounded-2xl md:rounded-[40px] bg-white p-2 md:p-4 shadow-2xl border border-slate-200/50 transform rotate-1 hover:rotate-0 transition-transform duration-500">
-            <div className="rounded-xl md:rounded-[32px] overflow-hidden border border-slate-100 bg-slate-50 aspect-[16/9] relative">
-              {/* Abstract Dashboard UI */}
-              <div className="absolute inset-0 p-6 flex flex-col">
-                {/* Topbar mock */}
-                <div className="h-12 w-full bg-white rounded-xl mb-6 shadow-sm border border-slate-100 flex items-center px-4 justify-between">
-                  <div className="w-32 h-4 bg-slate-200 rounded-full"></div>
-                  <div className="flex gap-2">
-                    <div className="w-8 h-8 rounded-full bg-slate-100"></div>
-                    <div className="w-8 h-8 rounded-full bg-blue-100"></div>
+          {/* Floating Dashboard Preview */}
+          <motion.div 
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4, type: "spring", bounce: 0.2 }}
+            className="w-full max-w-6xl mx-auto mt-24 relative z-10 perspective-[2000px]"
+          >
+            <div className="relative rounded-[2rem] bg-white/50 dark:bg-gradient-to-b dark:from-white/10 dark:to-white/5 p-1 border border-slate-200 dark:border-white/10 shadow-2xl backdrop-blur-xl transform rotateX-[10deg] hover:rotateX-[0deg] transition-transform duration-700 ease-out">
+              <div className="rounded-[1.8rem] overflow-hidden bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/5 flex flex-col aspect-[16/9] relative shadow-inner">
+                {/* Fake Mac Header */}
+                <div className="h-10 bg-slate-50 dark:bg-[#111] flex items-center px-4 gap-2 border-b border-slate-200 dark:border-white/5">
+                  <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+                  <div className="w-3 h-3 rounded-full bg-amber-500/80"></div>
+                  <div className="w-3 h-3 rounded-full bg-emerald-500/80"></div>
+                  <div className="mx-auto bg-white dark:bg-white/5 px-3 py-1 rounded-md flex items-center gap-2 border border-slate-200 dark:border-transparent shadow-sm dark:shadow-none">
+                    <Lock size={10} className="text-slate-400" />
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">jalawarta.com/dashboard</span>
                   </div>
                 </div>
                 
-                <div className="flex gap-6 flex-1">
-                  {/* Sidebar mock */}
-                  <div className="w-64 bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex flex-col gap-4">
-                    <div className="h-8 bg-slate-100 rounded-md w-full"></div>
-                    <div className="h-8 bg-slate-50 rounded-md w-3/4"></div>
-                    <div className="h-8 bg-slate-50 rounded-md w-5/6"></div>
-                    <div className="h-8 bg-slate-50 rounded-md w-full"></div>
+                {/* App Mockup UI */}
+                <div className="flex flex-1 p-4 gap-4 bg-slate-50/50 dark:bg-transparent">
+                  {/* Sidebar */}
+                  <div className="w-48 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/5 p-3 flex flex-col gap-3 hidden sm:flex shadow-sm dark:shadow-none">
+                    <div className="h-8 bg-[#eaf2fd] dark:bg-[#2f80ed]/20 border border-[#2f80ed]/30 rounded-lg w-full"></div>
+                    <div className="h-8 bg-slate-100 dark:bg-white/5 rounded-lg w-5/6"></div>
+                    <div className="h-8 bg-slate-100 dark:bg-white/5 rounded-lg w-4/6"></div>
+                    <div className="h-8 bg-slate-100 dark:bg-white/5 rounded-lg w-full"></div>
+                    <div className="mt-auto h-10 bg-slate-100 dark:bg-white/5 rounded-lg w-full flex items-center px-2 gap-2">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#81d4fa] to-[#2f80ed]"></div>
+                      <div className="h-3 bg-slate-300 dark:bg-white/20 rounded w-16"></div>
+                    </div>
                   </div>
                   
-                  {/* Content mock */}
-                  <div className="flex-1 flex flex-col gap-6">
-                    <div className="flex gap-6">
-                      <div className="flex-1 h-32 bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-                        <div className="h-4 w-24 bg-slate-100 rounded-full mb-4"></div>
-                        <div className="h-10 w-16 bg-blue-500/20 rounded-lg"></div>
+                  {/* Main Content */}
+                  <div className="flex-1 flex flex-col gap-4">
+                    {/* Stats */}
+                    <div className="flex gap-4">
+                      <div className="flex-1 h-24 bg-gradient-to-br from-[#eaf2fd] dark:from-[#2f80ed]/10 to-transparent border border-[#2f80ed]/20 rounded-xl p-4 flex flex-col justify-between bg-white dark:bg-transparent shadow-sm dark:shadow-none">
+                        <div className="h-3 w-20 bg-[#2f80ed]/40 dark:bg-[#2f80ed]/50 rounded"></div>
+                        <div className="h-8 w-24 bg-[#2f80ed]/80 rounded mt-auto"></div>
                       </div>
-                      <div className="flex-1 h-32 bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-                         <div className="h-4 w-24 bg-slate-100 rounded-full mb-4"></div>
-                        <div className="h-10 w-20 bg-indigo-500/20 rounded-lg"></div>
+                      <div className="flex-1 h-24 bg-gradient-to-br from-[#f2fbff] dark:from-[#81d4fa]/10 to-transparent border border-[#81d4fa]/20 rounded-xl p-4 flex flex-col justify-between hidden sm:flex bg-white dark:bg-transparent shadow-sm dark:shadow-none">
+                        <div className="h-3 w-20 bg-[#81d4fa]/60 dark:bg-[#81d4fa]/50 rounded"></div>
+                        <div className="h-8 w-24 bg-[#81d4fa]/80 rounded mt-auto"></div>
                       </div>
-                      <div className="flex-1 h-32 bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-                         <div className="h-4 w-24 bg-slate-100 rounded-full mb-4"></div>
-                        <div className="h-10 w-12 bg-emerald-500/20 rounded-lg"></div>
+                      <div className="flex-1 h-24 bg-gradient-to-br from-[#f0f9ff] dark:from-[#2360b2]/10 to-transparent border border-[#2360b2]/20 rounded-xl p-4 flex flex-col justify-between bg-white dark:bg-transparent shadow-sm dark:shadow-none">
+                        <div className="h-3 w-20 bg-[#2360b2]/40 dark:bg-[#2360b2]/50 rounded"></div>
+                        <div className="h-8 w-24 bg-[#2360b2]/80 rounded mt-auto"></div>
                       </div>
                     </div>
                     
-                    <div className="flex-1 bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                      <div className="h-4 w-48 bg-slate-200 rounded-full mb-8"></div>
-                      <div className="space-y-4">
-                        <div className="h-12 w-full bg-slate-50 rounded-lg"></div>
-                        <div className="h-12 w-full bg-slate-50 rounded-lg"></div>
-                        <div className="h-12 w-full bg-slate-50 rounded-lg"></div>
+                    {/* Chart Area */}
+                    <div className="flex-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl p-4 relative overflow-hidden flex flex-col shadow-sm dark:shadow-none">
+                      <div className="h-4 w-32 bg-slate-200 dark:bg-white/20 rounded mb-6"></div>
+                      <div className="flex-1 flex items-end gap-2 px-2 pb-2">
+                        {/* Fake Bar Chart */}
+                        {[40, 70, 45, 90, 65, 85, 120, 95, 110, 80, 130, 100].map((h, i) => (
+                          <div key={i} className="flex-1 bg-gradient-to-t from-[#2f80ed] to-[#81d4fa] rounded-t-sm" style={{ height: `${h}%`, opacity: 0.7 + (i * 0.02) }}></div>
+                        ))}
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
+          </motion.div>
+        </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-24 bg-white relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Kekuatan SaaS untuk Media Modern</h2>
-            <p className="text-lg text-slate-600">Tinggalkan kerumitan mengurus hosting dan plugin. Fokus pada pembuatan konten, biarkan infrastruktur kami yang bekerja.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:shadow-lg transition-all hover:-translate-y-1">
-              <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
-                <Cloud size={28} />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Cloud Auto-Scaling</h3>
-              <p className="text-slate-600 leading-relaxed">
-                Trafik meledak karena berita viral? Server Jala Warta akan menyesuaikan kapasitas secara otomatis tanpa downtime.
-              </p>
-            </div>
-
-            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:shadow-lg transition-all hover:-translate-y-1">
-              <div className="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-6">
-                <Zap size={28} />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Sistem Terintegrasi</h3>
-              <p className="text-slate-600 leading-relaxed">
-                CMS, Analytics, Paywall, dan Ad-Manager sudah terpasang dan siap digunakan tanpa perlu instalasi plugin pihak ketiga.
-              </p>
-            </div>
-
-            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:shadow-lg transition-all hover:-translate-y-1">
-              <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
-                <Shield size={28} />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Keamanan Enterprise</h3>
-              <p className="text-slate-600 leading-relaxed">
-                Proteksi DDoS bawaan, SSL otomatis, dan backup data harian memastikan portal berita Anda selalu aman dari serangan.
-              </p>
+        {/* Logos Section */}
+        <section className="py-10 border-y border-slate-200 dark:border-white/5 bg-white/50 dark:bg-white/5 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 uppercase tracking-widest">Dipercaya oleh portal media terdepan</p>
+            <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 opacity-60 dark:opacity-50 grayscale hover:grayscale-0 transition-all duration-500 text-slate-800 dark:text-slate-200">
+              {/* Abstract dummy logos */}
+              <div className="text-xl font-bold font-serif flex items-center gap-2"><div className="w-6 h-6 bg-current rounded-sm rotate-45"></div> NUSA NEWS</div>
+              <div className="text-xl font-extrabold tracking-tighter flex items-center gap-2"><Activity /> PULSA Media</div>
+              <div className="text-xl font-bold uppercase tracking-widest">Kabar<span className="font-light">Kini</span></div>
+              <div className="text-xl font-bold flex items-center gap-2"><Globe /> Regional<span className="text-[#2f80ed]">.ID</span></div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Distinction Section (CMS vs SaaS) */}
-      <section className="py-24 bg-slate-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">
-                Mengapa Memilih SaaS daripada CMS Tradisional?
-              </h2>
-              <p className="text-slate-400 text-lg mb-8 leading-relaxed">
-                CMS tradisional mengharuskan Anda menyewa server sendiri, memperbarui sistem, dan merakit puluhan plugin. Jala Warta memberikan pengalaman *All-in-One* yang bebas repot.
-              </p>
+        {/* Bento Grid Features */}
+        <section id="bento" className="py-32 relative">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeInUp}
+              className="text-center max-w-3xl mx-auto mb-20"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">Semua Alat dalam Satu Ekosistem</h2>
+              <p className="text-xl text-slate-600 dark:text-slate-400 font-light">Tidak perlu merakit puzzle plugin. JalaWarta menghadirkan pengalaman terpadu dari penulisan hingga monetisasi.</p>
+            </motion.div>
+
+            {/* Bento Box Grid */}
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[280px]"
+            >
+              {/* Big Feature 1 */}
+              <motion.div variants={fadeInUp} className="md:col-span-2 bg-white dark:bg-gradient-to-br dark:from-[#111] dark:to-[#0a0a0a] rounded-3xl p-8 border border-slate-200 dark:border-white/10 hover:border-[#2f80ed]/50 transition-colors group relative overflow-hidden shadow-sm dark:shadow-none">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#eaf2fd] dark:bg-[#2f80ed]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-[#bfd8f9] dark:group-hover:bg-[#2f80ed]/20 transition-all"></div>
+                <Activity className="text-[#2f80ed] w-10 h-10 mb-6 relative z-10" />
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">Real-time Analytics</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-lg max-w-md relative z-10">
+                  Pantau trafik, performa penulis, dan artikel trending detik ini juga. Insight mendalam tanpa perlu integrasi pihak ketiga yang memberatkan *loading* web.
+                </p>
+              </motion.div>
+
+              {/* Small Feature 1 */}
+              <motion.div variants={fadeInUp} className="bg-white dark:bg-gradient-to-br dark:from-[#111] dark:to-[#0a0a0a] rounded-3xl p-8 border border-slate-200 dark:border-white/10 hover:border-[#81d4fa]/50 transition-colors group relative overflow-hidden shadow-sm dark:shadow-none">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#f2fbff] dark:bg-[#81d4fa]/10 rounded-full blur-2xl group-hover:bg-[#d8f2fd] dark:group-hover:bg-[#81d4fa]/20 transition-all"></div>
+                <Cloud className="text-[#81d4fa] w-10 h-10 mb-6 relative z-10" />
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">Auto-Scaling Cloud</h3>
+                <p className="text-slate-600 dark:text-slate-400 relative z-10">
+                  Server otomatis membesar ketika ada berita viral. Nol downtime.
+                </p>
+              </motion.div>
+
+              {/* Small Feature 2 */}
+              <motion.div variants={fadeInUp} className="bg-white dark:bg-gradient-to-br dark:from-[#111] dark:to-[#0a0a0a] rounded-3xl p-8 border border-slate-200 dark:border-white/10 hover:border-[#619fbc]/50 transition-colors group relative overflow-hidden shadow-sm dark:shadow-none">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#f2fbff] dark:bg-[#619fbc]/10 rounded-full blur-2xl group-hover:bg-[#d8f2fd] dark:group-hover:bg-[#619fbc]/20 transition-all"></div>
+                <Shield className="text-[#619fbc] w-10 h-10 mb-6 relative z-10" />
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">Keamanan Enterprise</h3>
+                <p className="text-slate-600 dark:text-slate-400 relative z-10">
+                  Anti DDoS, WAF, dan SSL otomatis melindungi kredibilitas media Anda.
+                </p>
+              </motion.div>
+
+              {/* Big Feature 2 */}
+              <motion.div variants={fadeInUp} className="md:col-span-2 bg-white dark:bg-gradient-to-br dark:from-[#111] dark:to-[#0a0a0a] rounded-3xl p-8 border border-slate-200 dark:border-white/10 hover:border-[#2360b2]/50 transition-colors group relative overflow-hidden shadow-sm dark:shadow-none">
+                <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#eaf2fd] dark:bg-[#2360b2]/10 rounded-full blur-3xl translate-y-1/2 translate-x-1/2 group-hover:bg-[#bfd8f9] dark:group-hover:bg-[#2360b2]/20 transition-all"></div>
+                <Layers className="text-[#2360b2] w-10 h-10 mb-6" />
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">Headless Architecture API</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-lg max-w-md relative z-10">
+                  Distribusikan konten Anda ke Website, Aplikasi Mobile (iOS/Android), hingga Smart TV dengan API kami yang fleksibel dan berkecepatan tinggi.
+                </p>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Interactive SaaS vs CMS Comparison */}
+        <section className="py-24 bg-white dark:bg-[#0a0a0a] border-y border-slate-200 dark:border-white/5 relative overflow-hidden">
+          <div className="absolute left-0 top-1/2 w-[500px] h-[500px] bg-[#eaf2fd] dark:bg-[#2f80ed]/10 rounded-full blur-[120px] -translate-y-1/2 -translate-x-1/2"></div>
+          
+          <div className="max-w-5xl mx-auto px-4 relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">SaaS vs CMS Tradisional</h2>
+              <p className="text-slate-600 dark:text-slate-400 text-lg">Mengapa media besar beralih ke model Software-as-a-Service.</p>
+            </div>
+
+            <div className="bg-white dark:bg-[#111] border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-xl dark:shadow-2xl">
+              <div className="grid grid-cols-3 gap-0 p-6 bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10 font-bold text-sm text-slate-500 dark:text-slate-300 uppercase tracking-wider">
+                <div>Aspek Operasional</div>
+                <div className="text-center text-slate-400 dark:text-slate-500">CMS Open-Source</div>
+                <div className="text-center text-[#2f80ed] flex items-center justify-center gap-2">JalaWarta SaaS <Sparkles size={14}/></div>
+              </div>
               
-              <ul className="space-y-6">
-                <li className="flex items-start gap-4">
-                  <CheckCircle2 className="text-emerald-400 shrink-0 mt-1" size={24} />
-                  <div>
-                    <h4 className="font-bold text-lg mb-1">Pembaruan Sistem Otomatis</h4>
-                    <p className="text-slate-400">Tidak ada lagi "Update Failed". Sistem Jala Warta diperbarui secara terpusat tanpa mengganggu operasi media Anda.</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-4">
-                  <CheckCircle2 className="text-emerald-400 shrink-0 mt-1" size={24} />
-                  <div>
-                    <h4 className="font-bold text-lg mb-1">Infrastruktur Multi-Tenant</h4>
-                    <p className="text-slate-400">Arsitektur modern yang menjamin kecepatan akses super cepat di seluruh Indonesia melalui CDN premium kami.</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-4">
-                  <CheckCircle2 className="text-emerald-400 shrink-0 mt-1" size={24} />
-                  <div>
-                    <h4 className="font-bold text-lg mb-1">Dukungan Teknis B2B</h4>
-                    <p className="text-slate-400">Tim engineer kami memantau performa situs Anda 24/7. Anda tidak perlu mempekerjakan tim IT tambahan.</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-3xl transform rotate-3 scale-105 opacity-50 blur-lg"></div>
-              <div className="bg-slate-800 border border-slate-700 rounded-3xl p-8 relative z-10">
-                <div className="space-y-6">
-                  {/* Table Comparison Header */}
-                  <div className="grid grid-cols-3 gap-4 pb-4 border-b border-slate-700 font-bold text-sm">
-                    <div>Fitur</div>
-                    <div className="text-center text-slate-400">CMS Biasa</div>
-                    <div className="text-center text-blue-400">Jala Warta</div>
-                  </div>
-                  
-                  {/* Rows */}
-                  {[
-                    ["Hosting & Server", "Urus Sendiri", "Termasuk (Cloud)"],
-                    ["Maintenance", "Manual", "Otomatis"],
-                    ["Keamanan", "Beli Plugin", "Bawaan Enterprise"],
-                    ["Monetisasi", "Setup Rumit", "1-Klik Aktif"],
-                    ["Skalabilitas", "Terbatas Server", "Auto-Scale"]
-                  ].map((row, i) => (
-                    <div key={i} className="grid grid-cols-3 gap-4 pb-4 border-b border-slate-700/50 text-sm items-center">
-                      <div className="font-medium text-slate-300">{row[0]}</div>
-                      <div className="text-center text-slate-500">{row[1]}</div>
-                      <div className="text-center font-bold text-emerald-400 flex justify-center items-center gap-1">
-                        {row[2]}
-                      </div>
+              <div className="divide-y divide-slate-100 dark:divide-white/5">
+                {[
+                  { title: "Manajemen Server", bad: "Sewa & Setup Sendiri", good: "Fully Managed Cloud" },
+                  { title: "Penanganan Trafik Spike", bad: "Situs Down / 503 Error", good: "Auto-Scaling Instan" },
+                  { title: "Update & Maintenance", bad: "Manual Update (Risiko Rusak)", good: "Otomatis & Transparan" },
+                  { title: "Biaya Tersembunyi", bad: "Beli Plugin Premium & Security", good: "Harga Tetap, Fitur Lengkap" },
+                  { title: "Performa & Kecepatan", bad: "Tergantung Optimasi Pribadi", good: "Premium Global CDN" },
+                ].map((row, i) => (
+                  <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    key={i} 
+                    className="grid grid-cols-3 gap-4 p-6 text-sm sm:text-base items-center hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+                  >
+                    <div className="font-medium text-slate-800 dark:text-slate-200">{row.title}</div>
+                    <div className="text-center text-slate-500">{row.bad}</div>
+                    <div className="text-center font-bold text-slate-900 dark:text-white flex justify-center items-center gap-2">
+                      <CheckCircle2 size={18} className="text-[#2f80ed] hidden sm:block" /> {row.good}
                     </div>
-                  ))}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section id="pricing" className="py-32 relative">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-20">
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">Investasi Cerdas untuk Media</h2>
+              <p className="text-xl text-slate-600 dark:text-slate-400">Harga simpel, transparan, dan dapat diprediksi. Bebas biaya tersembunyi.</p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-center">
+              {/* Starter */}
+              <div className="bg-white dark:bg-[#111] rounded-3xl p-8 border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all flex flex-col h-full shadow-sm dark:shadow-none">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Starter</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">Bagi media lokal yang mulai berkembang.</p>
+                <div className="mb-8">
+                  <span className="text-4xl font-bold text-slate-900 dark:text-white">Rp 499k</span>
+                  <span className="text-slate-500">/bln</span>
+                </div>
+                <ul className="space-y-4 mb-8 flex-1">
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300"><CheckCircle2 size={18} className="text-[#2f80ed]/70" /> 100,000 Pageviews</li>
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300"><CheckCircle2 size={18} className="text-[#2f80ed]/70" /> 3 Akun Tim</li>
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300"><CheckCircle2 size={18} className="text-[#2f80ed]/70" /> Standar SSL & CDN</li>
+                </ul>
+                <button onClick={onLoginClick} className="w-full py-3 rounded-xl border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-bold hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                  Mulai Trial
+                </button>
+              </div>
+
+              {/* Pro - Highlighted */}
+              <div className="relative transform md:-translate-y-4">
+                <div className="absolute inset-0 bg-gradient-to-b from-[#81d4fa] to-[#2f80ed] rounded-3xl blur shadow-[0_0_40px_rgba(47,128,237,0.3)]"></div>
+                <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl p-8 border border-[#2f80ed]/30 dark:border-[#2f80ed]/50 flex flex-col relative h-full z-10 shadow-2xl">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#2f80ed] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg shadow-[#2f80ed]/50">
+                    Rekomendasi
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Professional</h3>
+                  <p className="text-[#2360b2] dark:text-[#eaf2fd]/70 text-sm mb-6">Skala menengah dengan trafik stabil.</p>
+                  <div className="mb-8">
+                    <span className="text-5xl font-bold text-slate-900 dark:text-white">Rp 1.5jt</span>
+                    <span className="text-slate-500 dark:text-[#eaf2fd]/50">/bln</span>
+                  </div>
+                  <ul className="space-y-4 mb-8 flex-1">
+                    <li className="flex items-center gap-3 text-slate-800 dark:text-white"><CheckCircle2 size={18} className="text-[#2f80ed] dark:text-[#81d4fa]" /> 1,000,000 Pageviews</li>
+                    <li className="flex items-center gap-3 text-slate-800 dark:text-white"><CheckCircle2 size={18} className="text-[#2f80ed] dark:text-[#81d4fa]" /> 15 Akun Tim</li>
+                    <li className="flex items-center gap-3 text-slate-800 dark:text-white"><CheckCircle2 size={18} className="text-[#2f80ed] dark:text-[#81d4fa]" /> Premium Global CDN</li>
+                    <li className="flex items-center gap-3 text-slate-800 dark:text-white"><CheckCircle2 size={18} className="text-[#2f80ed] dark:text-[#81d4fa]" /> AI Content Assistant</li>
+                  </ul>
+                  <button onClick={onLoginClick} className="w-full py-4 rounded-xl bg-[#2f80ed] hover:bg-[#2a73d5] text-white font-bold transition-all shadow-lg shadow-[#2f80ed]/25">
+                    Coba Gratis 14 Hari
+                  </button>
                 </div>
               </div>
+
+              {/* Enterprise */}
+              <div className="bg-white dark:bg-[#111] rounded-3xl p-8 border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all flex flex-col h-full shadow-sm dark:shadow-none">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Enterprise</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">Infrastruktur kustom skala nasional.</p>
+                <div className="mb-8">
+                  <span className="text-4xl font-bold text-slate-900 dark:text-white">Custom</span>
+                </div>
+                <ul className="space-y-4 mb-8 flex-1">
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300"><CheckCircle2 size={18} className="text-[#2f80ed]/70" /> Unlimited Pageviews</li>
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300"><CheckCircle2 size={18} className="text-[#2f80ed]/70" /> Dedicated Server</li>
+                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300"><CheckCircle2 size={18} className="text-[#2f80ed]/70" /> SLA 99.99% & 24/7 Support</li>
+                </ul>
+                <button className="w-full py-3 rounded-xl border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-bold hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                  Hubungi Sales
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-24 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Harga Transparan Sesuai Skala Media Anda</h2>
-            <p className="text-lg text-slate-600">Semua paket sudah termasuk Cloud Hosting, CDN, SSL, dan Maintenance.</p>
+        {/* Footer CTA & Footer */}
+        <footer className="relative border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-px bg-gradient-to-r from-transparent via-[#2f80ed] to-transparent opacity-50"></div>
+          
+          {/* Massive CTA */}
+          <div className="py-24 text-center px-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-8 tracking-tight">Siap mendisrupsi media digital?</h2>
+            <button onClick={onLoginClick} className="px-10 py-5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-lg hover:scale-105 transition-transform shadow-[0_0_40px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_rgba(255,255,255,0.2)]">
+              Mulai Gunakan JalaWarta
+            </button>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Starter */}
-            <div className="bg-white rounded-3xl p-8 border border-slate-200 hover:border-blue-300 transition-colors shadow-sm flex flex-col">
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Starter</h3>
-              <p className="text-slate-500 text-sm mb-6">Untuk media lokal yang baru berkembang.</p>
-              <div className="mb-8">
-                <span className="text-4xl font-extrabold text-slate-900">Rp 499k</span>
-                <span className="text-slate-500 font-medium">/bulan</span>
-              </div>
-              <ul className="space-y-4 mb-8 flex-1">
-                <li className="flex items-center gap-3 text-slate-600"><CheckCircle2 size={18} className="text-blue-500" /> 100,000 Pageviews/bln</li>
-                <li className="flex items-center gap-3 text-slate-600"><CheckCircle2 size={18} className="text-blue-500" /> 3 Akun Penulis</li>
-                <li className="flex items-center gap-3 text-slate-600"><CheckCircle2 size={18} className="text-blue-500" /> Standard CDN</li>
-                <li className="flex items-center gap-3 text-slate-600"><CheckCircle2 size={18} className="text-blue-500" /> Basic Analytics</li>
-              </ul>
-              <button 
-                onClick={onLoginClick}
-                className="w-full py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:border-blue-600 hover:text-blue-600 transition-colors"
-              >
-                Mulai Trial
-              </button>
-            </div>
-
-            {/* Pro - Highlighted */}
-            <div className="bg-blue-600 rounded-3xl p-8 border border-blue-500 shadow-xl shadow-blue-500/20 flex flex-col relative transform md:-translate-y-4">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                Paling Populer
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Professional</h3>
-              <p className="text-blue-100 text-sm mb-6">Untuk portal berita regional yang mapan.</p>
-              <div className="mb-8 text-white">
-                <span className="text-4xl font-extrabold">Rp 1.5jt</span>
-                <span className="text-blue-200 font-medium">/bulan</span>
-              </div>
-              <ul className="space-y-4 mb-8 flex-1 text-blue-50">
-                <li className="flex items-center gap-3"><CheckCircle2 size={18} className="text-white" /> 1,000,000 Pageviews/bln</li>
-                <li className="flex items-center gap-3"><CheckCircle2 size={18} className="text-white" /> 15 Akun Tim</li>
-                <li className="flex items-center gap-3"><CheckCircle2 size={18} className="text-white" /> Premium Global CDN</li>
-                <li className="flex items-center gap-3"><CheckCircle2 size={18} className="text-white" /> Advanced Insights</li>
-                <li className="flex items-center gap-3"><CheckCircle2 size={18} className="text-white" /> AI Assistant (Blur AI)</li>
-              </ul>
-              <button 
-                onClick={onLoginClick}
-                className="w-full py-3 rounded-xl bg-white text-blue-600 font-bold hover:bg-slate-50 transition-colors shadow-lg"
-              >
-                Mulai Trial
-              </button>
-            </div>
-
-            {/* Enterprise */}
-            <div className="bg-white rounded-3xl p-8 border border-slate-200 hover:border-blue-300 transition-colors shadow-sm flex flex-col">
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Enterprise</h3>
-              <p className="text-slate-500 text-sm mb-6">Skala nasional dengan kebutuhan kustom.</p>
-              <div className="mb-8">
-                <span className="text-4xl font-extrabold text-slate-900">Custom</span>
-              </div>
-              <ul className="space-y-4 mb-8 flex-1">
-                <li className="flex items-center gap-3 text-slate-600"><CheckCircle2 size={18} className="text-blue-500" /> Unlimited Pageviews</li>
-                <li className="flex items-center gap-3 text-slate-600"><CheckCircle2 size={18} className="text-blue-500" /> Unlimited Tim</li>
-                <li className="flex items-center gap-3 text-slate-600"><CheckCircle2 size={18} className="text-blue-500" /> Dedicated Server</li>
-                <li className="flex items-center gap-3 text-slate-600"><CheckCircle2 size={18} className="text-blue-500" /> Custom API & Headless</li>
-                <li className="flex items-center gap-3 text-slate-600"><CheckCircle2 size={18} className="text-blue-500" /> SLA 99.99%</li>
-              </ul>
-              <button className="w-full py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:border-slate-800 hover:text-slate-800 hover:bg-slate-50 transition-colors">
-                Hubungi Sales
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div className="md:col-span-1">
-              <div className="flex items-center gap-2 mb-4 text-white">
-                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-xs">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-slate-200 dark:border-white/10">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-[#2f80ed] flex items-center justify-center font-bold text-xs text-white">
                   JW
                 </div>
-                <span className="font-bold text-lg">Jala Warta</span>
+                <span className="font-bold text-lg text-slate-900 dark:text-white">JalaWarta</span>
               </div>
-              <p className="text-sm mb-4">
-                SaaS platform khusus portal berita. Bangun dan kembangkan media Anda tanpa memikirkan infrastruktur IT.
+              
+              <div className="flex gap-6 text-sm text-slate-500 dark:text-slate-400">
+                <a href="#" className="hover:text-[#2f80ed] dark:hover:text-white transition-colors">Privacy</a>
+                <a href="#" className="hover:text-[#2f80ed] dark:hover:text-white transition-colors">Terms</a>
+                <a href="#" className="hover:text-[#2f80ed] dark:hover:text-white transition-colors">API Status</a>
+                <a href="#" className="hover:text-[#2f80ed] dark:hover:text-white transition-colors">Twitter</a>
+              </div>
+              
+              <p className="text-sm text-slate-400 dark:text-slate-500">
+                &copy; 2026 JalaWarta SaaS. All rights reserved.
               </p>
             </div>
-            
-            <div>
-              <h4 className="text-white font-bold mb-4">Produk</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-blue-400 transition-colors">Fitur Utama</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition-colors">Harga</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition-colors">API Dokumentasi</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition-colors">Changelog</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-bold mb-4">Solusi</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-blue-400 transition-colors">Untuk Media Lokal</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition-colors">Untuk Jaringan Berita</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition-colors">Migrasi dari WordPress</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold mb-4">Perusahaan</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-blue-400 transition-colors">Tentang Kami</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition-colors">Kontak</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition-colors">Terms of Service</a></li>
-              </ul>
-            </div>
           </div>
-          
-          <div className="pt-8 border-t border-slate-800 text-sm text-center md:text-left flex flex-col md:flex-row justify-between items-center">
-            <p>&copy; 2026 Jala Warta SaaS. All rights reserved.</p>
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <span className="text-slate-500 hover:text-white cursor-pointer transition-colors">Twitter</span>
-              <span className="text-slate-500 hover:text-white cursor-pointer transition-colors">LinkedIn</span>
-              <span className="text-slate-500 hover:text-white cursor-pointer transition-colors">Instagram</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   );
 }
