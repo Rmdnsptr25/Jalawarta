@@ -9,6 +9,21 @@ const app = new Hono();
 const BUCKET_NAME = "make-038ff37a-media";
 
 let bucketEnsured = false;
+
+function getSupabaseClient() {
+  const url = Deno.env.get('SUPABASE_URL') || 'https://ursydobncvznxzwxszwl.supabase.co';
+  const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!key) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
+  
+  const publicUrl = url.includes('kong') || url.includes('localhost') 
+    ? 'https://ursydobncvznxzwxszwl.supabase.co' 
+    : url;
+
+  return createClient(publicUrl, key, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  });
+}
+
 async function ensureBucketExists(supabase: any) {
   if (bucketEnsured) return;
   try {
@@ -52,15 +67,7 @@ app.post("/make-server-038ff37a/signup", async (c) => {
       return c.json({ error: "Email and password are required" }, 400);
     }
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    
-    if (!supabaseUrl || !serviceRoleKey) {
-      console.error("Missing environment variables for Supabase");
-      return c.json({ error: "Server configuration error" }, 500);
-    }
-
-    const supabase = createClient(supabaseUrl, serviceRoleKey);
+    const supabase = getSupabaseClient();
     
     const { data, error } = await supabase.auth.admin.createUser({
       email,
@@ -71,7 +78,12 @@ app.post("/make-server-038ff37a/signup", async (c) => {
     });
 
     if (error) {
-      console.error("Error creating user:", error);
+      // Avoid logging as a hard error for expected cases like duplicate emails
+      if (error.code === 'email_exists' || error.status === 422) {
+        console.log(`Signup info: Email already exists (${email})`);
+      } else {
+        console.error("Error creating user:", error);
+      }
       return c.json({ error: error.message }, 400);
     }
 
@@ -87,9 +99,7 @@ app.post("/make-server-038ff37a/upload", async (c) => {
     const accessToken = c.req.header("Authorization")?.split(" ")[1];
     if (!accessToken) return c.json({ error: "Unauthorized" }, 401);
     
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const supabase = createClient(supabaseUrl!, serviceRoleKey!);
+    const supabase = getSupabaseClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken);
     if (authError || !user) return c.json({ error: "Unauthorized" }, 401);
@@ -146,9 +156,7 @@ app.get("/make-server-038ff37a/media", async (c) => {
     const accessToken = c.req.header("Authorization")?.split(" ")[1];
     if (!accessToken) return c.json({ error: "Unauthorized" }, 401);
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const supabase = createClient(supabaseUrl!, serviceRoleKey!);
+    const supabase = getSupabaseClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken);
     if (authError || !user) return c.json({ error: "Unauthorized" }, 401);
@@ -194,9 +202,7 @@ app.delete("/make-server-038ff37a/media/:fileName", async (c) => {
     const fileName = c.req.param("fileName");
     if (!fileName) return c.json({ error: "Filename is required" }, 400);
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const supabase = createClient(supabaseUrl!, serviceRoleKey!);
+    const supabase = getSupabaseClient();
     await ensureBucketExists(supabase);
 
     const { error } = await supabase.storage.from(BUCKET_NAME).remove([fileName]);
@@ -226,9 +232,7 @@ app.post("/make-server-038ff37a/posts", async (c) => {
     const accessToken = c.req.header("Authorization")?.split(" ")[1];
     if (!accessToken) return c.json({ error: "Unauthorized" }, 401);
     
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const supabase = createClient(supabaseUrl!, serviceRoleKey!);
+    const supabase = getSupabaseClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken);
     if (authError || !user) return c.json({ error: "Unauthorized" }, 401);
 
@@ -255,66 +259,7 @@ app.delete("/make-server-038ff37a/posts/:id", async (c) => {
     const accessToken = c.req.header("Authorization")?.split(" ")[1];
     if (!accessToken) return c.json({ error: "Unauthorized" }, 401);
     
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const supabase = createClient(supabaseUrl!, serviceRoleKey!);
-    const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken);
-    if (authError || !user) return c.json({ error: "Unauthorized" }, 401);
-
-    const id = c.req.param("id");
-    await kv.del(id);
-    return c.json({ success: true });
-  } catch (err: any) {
-    return c.json({ error: err.message }, 500);
-  }
-});
-
-app.get("/make-server-038ff37a/posts", async (c) => {
-  try {
-    const posts = await kv.getByPrefix("post_");
-    return c.json({ posts: posts.sort((a, b) => b.createdAt - a.createdAt) });
-  } catch (err: any) {
-    return c.json({ error: err.message }, 500);
-  }
-});
-
-app.post("/make-server-038ff37a/posts", async (c) => {
-  try {
-    const accessToken = c.req.header("Authorization")?.split(" ")[1];
-    if (!accessToken) return c.json({ error: "Unauthorized" }, 401);
-    
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const supabase = createClient(supabaseUrl!, serviceRoleKey!);
-    const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken);
-    if (authError || !user) return c.json({ error: "Unauthorized" }, 401);
-
-    const body = await c.req.json();
-    const id = body.id || `post_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    const post = {
-      ...body,
-      id,
-      authorId: user.id,
-      authorName: user.user_metadata?.name || user.email,
-      createdAt: body.createdAt || Date.now(),
-      updatedAt: Date.now(),
-    };
-    
-    await kv.set(id, post);
-    return c.json({ success: true, post });
-  } catch (err: any) {
-    return c.json({ error: err.message }, 500);
-  }
-});
-
-app.delete("/make-server-038ff37a/posts/:id", async (c) => {
-  try {
-    const accessToken = c.req.header("Authorization")?.split(" ")[1];
-    if (!accessToken) return c.json({ error: "Unauthorized" }, 401);
-    
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const supabase = createClient(supabaseUrl!, serviceRoleKey!);
+    const supabase = getSupabaseClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken);
     if (authError || !user) return c.json({ error: "Unauthorized" }, 401);
 

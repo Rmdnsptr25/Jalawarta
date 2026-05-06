@@ -131,7 +131,6 @@ export function LandingPage({ onLoginClick }: LandingPageProps) {
           <div className="absolute top-1/2 left-1/2 w-[800px] h-[400px] bg-[#2360b2]/10 dark:bg-[#2360b2]/20 rounded-full blur-[120px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
 
           {/* Grid pattern overlay */}
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] dark:opacity-20 pointer-events-none mix-blend-overlay"></div>
           <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none"></div>
 
           <div className="max-w-5xl mx-auto text-center relative z-10 flex flex-col items-center">

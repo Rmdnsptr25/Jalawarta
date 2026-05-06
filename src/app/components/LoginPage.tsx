@@ -85,9 +85,17 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     } catch (err: any) {
       let errorMsg = err.message || "Mohon periksa kembali data Anda.";
       
-      toast.error("Terjadi Kesalahan", {
-        description: `[Debug] ${errorMsg}`,
-      });
+      if (errorMsg.includes("already been registered") || errorMsg.includes("email_exists")) {
+        toast.error("Email Sudah Terdaftar", {
+          description: "Akun dengan email ini sudah ada. Silakan pindah ke tab 'Masuk' untuk login, atau gunakan email lain.",
+        });
+        // Switch to login tab automatically to help the user
+        setActiveTab("login");
+      } else {
+        toast.error("Terjadi Kesalahan", {
+          description: errorMsg,
+        });
+      }
     } finally {
       setIsLoading(false);
     }
